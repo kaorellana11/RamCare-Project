@@ -1,16 +1,20 @@
 import customtkinter as ctk
 
-FONT_SIZE = 22
+FONT_SIZE = 15
 FONT_FAMILY = "Lucida Console"
 
 #Truncates the string to a desired length, leaving an ellipsis at the end
 def truncate_label(str, length):
-
-
     str = str
     if len(str) > length:
         return str[:length - 3] + "..."
     return str
+
+def swap_screen(new_screen):
+    for widget in app.winfo_children():
+        widget.destroy()
+    app = new_screen()
+    
 
 #Class that holds all the information relating to patients
     #Note that this may become deprecated once database is implemented
@@ -40,10 +44,10 @@ class PatientTable(ctk.CTkScrollableFrame):
 
         #Constants below define the max string length of each respective label, except DOB since it has a constant length
         #Check length when editing values
-        self.NAME_LENGTH = 15
+        self.NAME_LENGTH = 24
         self.BLOOD_TYPE_LENGTH = 70
-        self.EMAIL_LENGTH = 24
-        self.MEDS_LENGTH = 20
+        self.EMAIL_LENGTH = 40
+        self.MEDS_LENGTH = 30
 
         index = 0
 
@@ -91,9 +95,10 @@ class PatientTable(ctk.CTkScrollableFrame):
 
             index += 1
 
-class App(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+#Need to implement a way to display different pages for the table: likely will wait on db implementation
+class TableScreen(ctk.CTk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         ctk.set_appearance_mode("light")
         self.title("RamCare")
         self.geometry("1280x720")
@@ -132,5 +137,9 @@ class App(ctk.CTk):
     def delete_patient(self):
         pass
 
-app = App()
+class TestScreen(ctk.CTk):
+    def __init__(self):
+        pass
+
+app = TableScreen()
 app.mainloop()
