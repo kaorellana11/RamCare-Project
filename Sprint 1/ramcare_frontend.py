@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import ramcare_backend as back
+from ramcare_backend import Patient
 
 FONT_SIZE = 15
 FONT_FAMILY = "Lucida Console"
@@ -14,22 +15,6 @@ def truncate_label(str, length):
 def raise_screen(screen):
     screen.tkraise()
 
-#Class that holds all the information relating to patients
-    #Note that this may become deprecated once database is implemented
-class Patient():
-    #Name: A String with the patient's name
-    #blood_type: A String with the patient's blood type
-    #meds: A String Array containing all of the patient's medications
-    #dob: A String containing the patients date of birth.
-    #     Must be formatted as XX/XX/XXXX
-    #email: A String Array containing the patient's email
-    def __init__(self, name, blood_type, meds, dob, email):
-        self.name = name
-        self.blood_type = blood_type
-        self.dob = dob
-        self.email = email
-        self.meds = meds
-
 #A frame that contains the information of many patients
 class PatientTable(ctk.CTkScrollableFrame):
     #Master: a CTk Object where the PatientTable will be displayed
@@ -37,7 +22,7 @@ class PatientTable(ctk.CTkScrollableFrame):
     #Patients: An array of all patient objects that will be displayed in the table
     def __init__(self, master, patients):
         super().__init__(master)
-        
+        self.master = master
         self.grid_columnconfigure(0, weight=1)
         self.radio_var = ctk.StringVar(value="")
 
@@ -47,9 +32,10 @@ class PatientTable(ctk.CTkScrollableFrame):
         self.BLOOD_TYPE_LENGTH = 70
         self.EMAIL_LENGTH = 40
         self.MEDS_LENGTH = 30
+        self.populate_table(patients)
 
+    def populate_table(patients):
         index = 0
-
         #loop creates separate rows for each patient
             #Note that the way that data is obtained for each patient will be different once database is implemented
             #Rafactoring will be necessary
@@ -100,14 +86,8 @@ class TableScreen(ctk.CTkFrame):
         self.grid_columnconfigure(3, weight=1)
         self.grid_rowconfigure(0, weight=2)
         self.grid_rowconfigure(1, weight=1)
-
-        #creates an array of patients by iterating through tuples containing patient info
-        #get rid of this once database is implemented
-        patients = [Patient(name, blood_type, meds, dob, email) for 
-                    name, blood_type, meds, dob, email in 
-                    [("John Doe", "AB+", ["None"], "01/01/2000", "john.doe@gmail.com"),
-                     ("Longname Johnson", "A+", ["Talimogene Laherparepvec"], "01/01/2000", "longname.johnson.2000@gmail.com")]]
         
+
         self.table = PatientTable(self, patients)
         self.table.grid(row=0, column=0, padx=20, pady=(10, 0), sticky="nsew", columnspan=4)
 
@@ -221,5 +201,6 @@ class App(ctk.CTk):
         self.table_screen.tkraise()
 
 if __name__ == "__main__":
+    back.create_table()
     app = App()
     app.mainloop()
