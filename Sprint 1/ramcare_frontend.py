@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-FONT_SIZE = 22
+FONT_SIZE = 15
 FONT_FAMILY = "Lucida Console"
 
 #Truncates the string to a desired length, leaving an ellipsis at the end
@@ -42,10 +42,10 @@ class PatientTable(ctk.CTkScrollableFrame):
 
         #Constants below define the max string length of each respective label, except DOB since it has a constant length
         #Check length when editing values
-        self.NAME_LENGTH = 15
+        self.NAME_LENGTH = 24
         self.BLOOD_TYPE_LENGTH = 70
-        self.EMAIL_LENGTH = 24
-        self.MEDS_LENGTH = 20
+        self.EMAIL_LENGTH = 40
+        self.MEDS_LENGTH = 30
 
         index = 0
 
