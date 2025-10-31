@@ -69,24 +69,53 @@ def create_table():
 def insert_data(name, blood_type, medicines, dob, email, number):
     #Insert Data
     cursor.execute("INSERT INTO RAMCARE (Name, Blood_Type, Medicines, Date_of_birth, Email, Phone_Number) VALUES (?, ?, ?, ?, ?, ?)", (name, blood_type, medicines, dob, email, number))
-
+    sort_data()
     #Make sure to commit the changes to the database
     connection_obj.commit()
 
+def fetch_rows(page):
+    offset = page * 20
+    cursor.execute("SELECT * FROM RAMCARE LIMIT ? OFFSET ?", (20, offset))
+
+    patients = []
+    for i in cursor:
+        patients.append(Patient(*i))
+    return patients
+
+def sort_data():
+    cursor.execute('''
+        CREATE TABLE RAMCARE_ORDERED (
+            Name VARCHAR(30) NOT NULL,
+            Blood_Type CHAR(5) NOT NULL,
+            Medicines VARCHAR(50) NOT NULL,
+            Date_of_birth CHAR(10) NOT NULL,
+            Email VARCHAR(30) NOT NULL,
+            Phone_Number CHAR(14) NOT NULL
+        );
+    ''')
+    cursor.execute("INSERT INTO RAMCARE_ORDERED (Name, Blood_Type, Medicines, Date_of_birth, Email, Phone_Number) SELECT Name, Blood_Type, Medicines, Date_of_birth, Email, Phone_Number FROM RAMCARE ORDER BY Name;")
+    cursor.execute("DROP TABLE RAMCARE;")
+    cursor.execute("ALTER TABLE RAMCARE_ORDERED RENAME TO RAMCARE;")
+    
+    connection_obj.commit()
+
+
 def create_patient(name, blood_type, medicines, dob, email, number):
     insert_data(name, blood_type, medicines, dob, email, number)
+    sort_data()
     print("Patient Successfully Entered")
 
 def edit_patient(name, blood_type, medicines, dob, email, number, patientName):
     #Update Data
     cursor.execute("UPDATE RAMCARE SET Name = ?, Blood_Type = ?, Medicines = ?, Date_of_birth = ?, Email = ?, Phone_Number = ? WHERE Name = ?;", (name, blood_type, medicines, dob, email, number, patientName))
-
+    sort_data()
     #Make sure to commit changes to the database
     connection_obj.commit()
 
 def delete_patient(name):
     #Possible edge case where two patients have the same name
     cursor.execute("DELETE FROM RAMCARE WHERE Name = ?", (name,))
+    sort_data()
 
 def search_by_name(name):
     cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
@@ -97,7 +126,7 @@ def search_by_name(name):
 def main():
     create_table()
 
-    name = "Robert Smith"
+    name = "Robert Smtih"
     blood_type = "AB+"
     medicines = "Tylenol"
     dob = "03/21/2005"
@@ -108,9 +137,10 @@ def main():
     print("Data successfully inserted")
     insert_data("Kay Orellana", "O-", "Ibuprofen", "10/04/2004", "kaorellana52@gmail.com", "(123)-456-7890")
 
-    edit_patient("Tahj Williams", "AB-", "Tylenol", "12/05/1998", "tahj@coolguy.com", "(123)-456-7890", "Robert Smith")
-    delete_patient("Tahj Williams")
-    search_by_name("Kay Orellana")
+    sort_data()
+    #edit_patient("Tahj Williams", "AB-", "Tylenol", "12/05/1998", "tahj@coolguy.com", "(123)-456-7890", "Robert Smith")
+    #delete_patient("Tahj Williams")
+    #search_by_name("Kay")
 
 
 if __name__ == '__main__':
