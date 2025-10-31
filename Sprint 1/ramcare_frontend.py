@@ -31,10 +31,16 @@ class PatientTable(ctk.CTkScrollableFrame):
         self.NAME_LENGTH = 24
         self.BLOOD_TYPE_LENGTH = 70
         self.EMAIL_LENGTH = 40
-        self.MEDS_LENGTH = 30
+        self.medicines_LENGTH = 30
+        self.rows = []
         self.populate_table(patients)
 
-    def populate_table(patients):
+    def populate_table(self, patients):
+        #destroy any rows containing previous objects
+        for row in self.rows:
+            row.destroy()
+        self.rows = [] #clear rows array
+
         index = 0
         #loop creates separate rows for each patient
             #Note that the way that data is obtained for each patient will be different once database is implemented
@@ -55,18 +61,18 @@ class PatientTable(ctk.CTkScrollableFrame):
             blood_type.grid(row=index, column=1, padx=(10, 0), pady=10, sticky="w")
             blood_type.cget("font").configure(size=FONT_SIZE, family=FONT_FAMILY)
             
-            #Creates a string to be placed on the table in the meds slot, then truncates it
-            meds_str = ""
-            if len(patient.meds) == 1:
-                meds_str = patient.meds[0]
+            #Creates a string to be placed on the table in the medicines slot, then truncates it
+            medicines_str = ""
+            if len(patient.medicines) == 1:
+                medicines_str = patient.medicines[0]
             else:
-                for med in patient.meds:
-                    meds_str += med + ", "
-            meds_str = truncate_label(meds_str, self.MEDS_LENGTH)
+                for med in patient.medicines:
+                    medicines_str += med + ", "
+            medicines_str = truncate_label(medicines_str, self.medicines_LENGTH)
 
-            meds = ctk.CTkLabel(row_frame, text=meds_str, corner_radius=20, anchor="w", width=300)
-            meds.grid(row=index, column=2, padx=(10, 0), pady=10, sticky="w")
-            meds.cget("font").configure(size=FONT_SIZE, family=FONT_FAMILY)
+            medicines = ctk.CTkLabel(row_frame, text=medicines_str, corner_radius=20, anchor="w", width=300)
+            medicines.grid(row=index, column=2, padx=(10, 0), pady=10, sticky="w")
+            medicines.cget("font").configure(size=FONT_SIZE, family=FONT_FAMILY)
 
             dob = ctk.CTkLabel(row_frame, text=patient.dob, corner_radius=20, anchor="w")
             dob.grid(row=index, column=3, padx=(10, 0), pady=10, sticky="w")
@@ -77,19 +83,26 @@ class PatientTable(ctk.CTkScrollableFrame):
             email.grid(row=index, column=4, padx=10, pady=10, sticky="w")
             email.cget("font").configure(size=FONT_SIZE, family=FONT_FAMILY)
 
+            self.rows.append(row_frame)
+
             index += 1
 
 class TableScreen(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
-        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure((3, 4), weight=1)
         self.grid_rowconfigure(0, weight=2)
         self.grid_rowconfigure(1, weight=1)
+        self.page_num = 0
         
-
+        patients = back.fetch_rows(0)
+        #patients = [Patient(name, blood_type, meds, dob, email, number) for 
+        #            name, blood_type, meds, dob, email, number in 
+        #            [("John Doe", "AB+", ["None"], "01/01/2000", "john.doe@gmail.com", "123-456-7890"),
+        #             ("Longname Johnson", "A+", ["Talimogene Laherparepvec"], "01/01/2000", "longname.johnson.2000@gmail.com", "123-456-7890")]]
         self.table = PatientTable(self, patients)
-        self.table.grid(row=0, column=0, padx=20, pady=(10, 0), sticky="nsew", columnspan=4)
+        self.table.grid(row=0, column=0, padx=20, pady=(10, 0), sticky="nsew", columnspan=5)
 
         self.create_patient_button = ctk.CTkButton(self, text="Create Patient",command=self.create_patient)
         self.create_patient_button.grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nw")
@@ -102,6 +115,13 @@ class TableScreen(ctk.CTkFrame):
         self.delete_patient_button = ctk.CTkButton(self, text="Delete Patient",command=self.delete_patient)
         self.delete_patient_button.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky="nw")
         self.delete_patient_button.cget("font").configure(family=FONT_FAMILY, size=FONT_SIZE)
+
+        self.prev_page_button = ctk.CTkButton(self, text="Prev Page", command=self.prev_page)
+        self.prev_page_button.grid(row=1, column=3, padx=(20, 0), pady=(20, 0), sticky="ne")
+
+        self.next_page_button = ctk.CTkButton(self, text="Next Page", command=self.next_page)
+        self.next_page_button.grid(row = 1, column = 4, padx=20, pady=(20, 0), sticky="ne")
+
     def create_patient(self):
         raise_screen(self.master.edit_screen)
         self.master.edit_screen.set_button_command("create")
@@ -111,6 +131,12 @@ class TableScreen(ctk.CTkFrame):
         self.master.edit_screen.set_button_command("edit")
     
     def delete_patient(self):
+        pass
+
+    def next_page(self):
+        pass
+    
+    def prev_page(self):
         pass
 
 class EditScreen(ctk.CTkFrame):
@@ -134,12 +160,12 @@ class EditScreen(ctk.CTkFrame):
         blood_type_box.grid(row=1, column=1, padx=(10, 0), pady=(20, 0), sticky="nw")  
         self.input_boxes.append(blood_type_box)
 
-        meds_label = ctk.CTkLabel(self, text="Medications",anchor="w")
-        meds_label.grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
+        medicines_label = ctk.CTkLabel(self, text="Medications",anchor="w")
+        medicines_label.grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
 
-        meds_box = ctk.CTkTextbox(self, corner_radius=6, height=40)
-        meds_box.grid(row=2, column=1, padx=(10, 0), pady=(20, 0), sticky="nw")   
-        self.input_boxes.append(meds_box) 
+        medicines_box = ctk.CTkTextbox(self, corner_radius=6, height=40)
+        medicines_box.grid(row=2, column=1, padx=(10, 0), pady=(20, 0), sticky="nw")   
+        self.input_boxes.append(medicines_box) 
 
         dob_label = ctk.CTkLabel(self, text="Date of Birth",anchor="w")
         dob_label.grid(row=3, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
@@ -191,6 +217,7 @@ class App(ctk.CTk):
         self.geometry("1280x720")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        back.create_table()
         
         self.table_screen = TableScreen(self)
         self.table_screen.grid(row=0, column=0, sticky="nsew")
@@ -200,7 +227,12 @@ class App(ctk.CTk):
         
         self.table_screen.tkraise()
 
+        self.protocol("WM_DELETE_WINDOW", self.closed)
+    
+    def closed(self):
+        back.connection_obj.close()
+        self.destroy()
+
 if __name__ == "__main__":
-    back.create_table()
     app = App()
     app.mainloop()

@@ -1,5 +1,5 @@
 import sqlite3
-from pathlib import Path
+import os.path
 
 #Patient object for easier editing
 class Patient:
@@ -44,16 +44,20 @@ class Patient:
 #In order to execute SQL commands to edit the database, we need to first connect
 #to the SQLite database. If a database file does not exist, one will automatically
 #be created.
-connection_obj = sqlite3.connect('ramcare.db')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, "ramcare.db")
+
+connection_obj = sqlite3.connect(db_path)
 
 #Then, we create a cursor object. The cursor object will act as a middleman between
 #the SQLite database and SQL commands.
 cursor = connection_obj.cursor() 
 
 def create_table():
-    if Path("ramcare.db").is_file():
-        print("Database already exists.")
-    else:
+
+    #if os.path.exists(db_path):
+    #    print("Database already exists.")
+    #else:
         #Clear the table if it already exists
         cursor.execute("DROP TABLE IF EXISTS RAMCARE")
 
@@ -69,7 +73,8 @@ def create_table():
                 Phone_Number CHAR(14) NOT NULL
             );
         ''')
-    
+        insert_data("Kay Orellana", "O-", "Ibuprofen", "10/04/2004", "kaorellana52@gmail.com", "(123)-456-7890")
+        
 
 def insert_data(name, blood_type, medicines, dob, email, number):
     #Insert Data
@@ -152,4 +157,4 @@ if __name__ == '__main__':
     main()
 
 #Close the connection to the database
-connection_obj.close()
+#connection_obj.close()
