@@ -77,6 +77,17 @@ def create_patient(name, blood_type, medicines, dob, email, number):
     insert_data(name, blood_type, medicines, dob, email, number)
     print("Patient Successfully Entered")
 
+def edit_patient(name, blood_type, medicines, dob, email, number, patientName):
+    #Update Data
+    cursor.execute("UPDATE RAMCARE SET Name = ?, Blood_Type = ?, Medicines = ?, Date_of_birth = ?, Email = ?, Phone_Number = ? WHERE Name = ?;", (name, blood_type, medicines, dob, email, number, patientName))
+
+    #Make sure to commit changes to the database
+    connection_obj.commit()
+
+def delete_patient(name):
+    #Possible edge case where two patients have the same name
+    cursor.execute("DELETE FROM RAMCARE WHERE Name = ?", (name,))
+
 def search_by_name(name):
     cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
     print(cursor.fetchall())
@@ -97,7 +108,8 @@ def main():
     print("Data successfully inserted")
     insert_data("Kay Orellana", "O-", "Ibuprofen", "10/04/2004", "kaorellana52@gmail.com", "(123)-456-7890")
 
-
+    edit_patient("Tahj Williams", "AB-", "Tylenol", "12/05/1998", "tahj@coolguy.com", "(123)-456-7890", "Robert Smith")
+    delete_patient("Tahj Williams")
     search_by_name("Kay Orellana")
 
 
