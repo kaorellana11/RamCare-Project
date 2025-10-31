@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import ramcare_backend as back
 
 FONT_SIZE = 15
 FONT_FAMILY = "Lucida Console"
@@ -53,7 +54,6 @@ class PatientTable(ctk.CTkScrollableFrame):
             #Note that the way that data is obtained for each patient will be different once database is implemented
             #Rafactoring will be necessary
         for patient in patients:
-            
             #Creates a frame for the whole row
             row_frame = ctk.CTkFrame(self, border_width=2, border_color="black")
             row_frame.grid(row=index, column=0, columnspan=6, sticky="nsew", pady=(10, 0))
@@ -123,10 +123,12 @@ class TableScreen(ctk.CTkFrame):
         self.delete_patient_button.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky="nw")
         self.delete_patient_button.cget("font").configure(family=FONT_FAMILY, size=FONT_SIZE)
     def create_patient(self):
-        pass
+        raise_screen(self.master.edit_screen)
+        self.master.edit_screen.set_button_command("create")
 
     def edit_patient(self):
         raise_screen(self.master.edit_screen)
+        self.master.edit_screen.set_button_command("edit")
     
     def delete_patient(self):
         pass
@@ -180,16 +182,25 @@ class EditScreen(ctk.CTkFrame):
         phone_number_box.grid(row=5, column=1, padx=(10, 0), pady=(20, 0), sticky="nw")
         self.input_boxes.append(phone_number_box)
 
-        submit_button = ctk.CTkButton(self, text="Submit", command=self.button_callback)
-        submit_button.grid(row=6, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
-        
-    def button_callback(self):
+        self.submit_button = ctk.CTkButton(self, text="Submit", command=self.edit_patient)
+        self.submit_button.grid(row=6, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
+
+    def set_button_command(self, command_name):
+        if (command_name == "edit"):
+            self.submit_button.configure(command=self.edit_patient)
+        elif (command_name == "create"):
+            self.submit_button.configure(command=self.create_patient)
+
+    def edit_patient(self):
         patient_arr = []
         for box in self.input_boxes:
             patient_arr.append(box.get("0.0", "end-1c"))
+            box.delete("0.0", "end-1c")
         raise_screen(self.master.table_screen)
-        return patient_arr
+        print(patient_arr)
 
+    def create_patient(self):
+        raise_screen(self.master.table_screen)   
 
 #The root of all the screens in the app.  
 class App(ctk.CTk):
