@@ -125,7 +125,6 @@ def search_by_name(name):
     
 
 def main():
-    
     create_table()
 
     name = "Robert Smtih"
@@ -143,6 +142,8 @@ def main():
     #edit_patient("Tahj Williams", "AB-", "Tylenol", "12/05/1998", "tahj@coolguy.com", "(123)-456-7890", "Robert Smith")
     #delete_patient("Tahj Williams")
     #search_by_name("Kay")
+    
+    connection_obj.close()
 
 
 if __name__ == '__main__':
