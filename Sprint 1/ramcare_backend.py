@@ -120,12 +120,12 @@ def delete_patient(name):
     sort_data()
 
 def search_by_name(name):
-    patient_info = cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
-    found_patient = Patient(*patient_info)
-    return found_patient
+    patient_info = cursor.execute("SELECT * from RAMCARE WHERE Name = ? LIMIT 1", (name,))
+    return tuple(patient_info)
     
 
 def main():
+    
     create_table()
 
     name = "Robert Smtih"

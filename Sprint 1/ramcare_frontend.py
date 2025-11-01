@@ -24,7 +24,6 @@ class PatientTable(ctk.CTkScrollableFrame):
         super().__init__(master)
         self.master = master
         self.grid_columnconfigure(0, weight=1)
-        self.radio_var = ctk.StringVar(value="")
 
         #Constants below define the max string length of each respective label, except DOB since it has a constant length
         #Check length when editing values
@@ -53,7 +52,7 @@ class PatientTable(ctk.CTkScrollableFrame):
             row_frame.grid_columnconfigure((1, 3), weight=2)
 
             name_str = truncate_label(patient.name, self.NAME_LENGTH)
-            radio_button = ctk.CTkRadioButton(row_frame, text=name_str, corner_radius=20, value=patient.name, variable=self.radio_var, width=240)
+            radio_button = ctk.CTkRadioButton(row_frame, text=name_str, corner_radius=20, value=patient.name, variable=self.master.master.radio_var, width=240)
             radio_button.grid(row=index, column=0, padx=(10, 0), pady=10, sticky="w")
             radio_button.cget("font").configure(size=FONT_SIZE, family=FONT_FAMILY)
 
@@ -63,11 +62,12 @@ class PatientTable(ctk.CTkScrollableFrame):
             
             #Creates a string to be placed on the table in the medicines slot, then truncates it
             medicines_str = ""
-            if len(patient.medicines) == 1:
-                medicines_str = patient.medicines[0]
-            else:
-                for med in patient.medicines:
-                    medicines_str += med + ", "
+            
+            #if len(patient.medicines) == 1:
+            medicines_str = patient.medicines
+            #else:
+            #    for med in patient.medicines:
+            #        medicines_str += med + ", "
             medicines_str = truncate_label(medicines_str, self.medicines_LENGTH)
 
             medicines = ctk.CTkLabel(row_frame, text=medicines_str, corner_radius=20, anchor="w", width=300)
@@ -97,10 +97,7 @@ class TableScreen(ctk.CTkFrame):
         self.page_num = 0
         
         patients = back.fetch_rows(0)
-        #patients = [Patient(name, blood_type, meds, dob, email, number) for 
-        #            name, blood_type, meds, dob, email, number in 
-        #            [("John Doe", "AB+", ["None"], "01/01/2000", "john.doe@gmail.com", "123-456-7890"),
-        #             ("Longname Johnson", "A+", ["Talimogene Laherparepvec"], "01/01/2000", "longname.johnson.2000@gmail.com", "123-456-7890")]]
+
         self.table = PatientTable(self, patients)
         self.table.grid(row=0, column=0, padx=20, pady=(10, 0), sticky="nsew", columnspan=5)
 
@@ -118,26 +115,41 @@ class TableScreen(ctk.CTkFrame):
 
         self.prev_page_button = ctk.CTkButton(self, text="Prev Page", command=self.prev_page)
         self.prev_page_button.grid(row=1, column=3, padx=(20, 0), pady=(20, 0), sticky="ne")
+        self.prev_page_button.cget("font").configure(family=FONT_FAMILY, size=FONT_SIZE)
 
         self.next_page_button = ctk.CTkButton(self, text="Next Page", command=self.next_page)
         self.next_page_button.grid(row = 1, column = 4, padx=20, pady=(20, 0), sticky="ne")
+        self.next_page_button.cget("font").configure(family=FONT_FAMILY, size=FONT_SIZE)
 
     def create_patient(self):
         raise_screen(self.master.edit_screen)
         self.master.edit_screen.set_button_command("create")
 
     def edit_patient(self):
+        patient = back.search_by_name(self.master.radio_var.get())
+        count = 0
+        for box in self.master.edit_screen.input_boxes:
+            box.insert("0.0", patient[0][count])
+            count += 1
         raise_screen(self.master.edit_screen)
         self.master.edit_screen.set_button_command("edit")
     
     def delete_patient(self):
-        pass
+        patient = back.search_by_name(self.master.radio_var.get())[0][0]
+        print("Patient Type: " + str(type(patient[0][0])))
+        back.delete_patient(patient)
+        self.master.table_screen.table.populate_table(back.fetch_rows(self.master.table_screen.page_num))
 
     def next_page(self):
-        pass
+        if len(self.table.rows) == 20:
+            self.page_num += 1
+            self.master.table_screen.table.populate_table(back.fetch_rows(self.master.table_screen.page_num))
     
     def prev_page(self):
-        pass
+        if (self.page_num > 0):
+            self.page_num -= 1
+            self.master.table_screen.table.populate_table(back.fetch_rows(self.master.table_screen.page_num))
+
 
 class EditScreen(ctk.CTkFrame):
     def __init__(self, master):
@@ -198,14 +210,23 @@ class EditScreen(ctk.CTkFrame):
             self.submit_button.configure(command=self.create_patient)
 
     def edit_patient(self):
+        original_name = self.input_boxes[0].get("0.0", "end-1c")
         patient_arr = []
         for box in self.input_boxes:
-            patient_arr.append(box.get("0.0", "end-1c"))
+            patient_arr.append(str(box.get("0.0", "end-1c")))
             box.delete("0.0", "end-1c")
+        patient_arr.append(original_name)
+        back.edit_patient(*patient_arr)
+        self.master.table_screen.table.populate_table(back.fetch_rows(self.master.table_screen.page_num))
         raise_screen(self.master.table_screen)
-        print(patient_arr)
 
     def create_patient(self):
+        patient_arr = []
+        for box in self.input_boxes:
+            patient_arr.append(str(box.get("0.0", "end-1c")))
+            box.delete("0.0", "end-1c")
+        back.create_patient(*patient_arr)
+        self.master.table_screen.table.populate_table(back.fetch_rows(self.master.table_screen.page_num))
         raise_screen(self.master.table_screen)   
 
 #The root of all the screens in the app.  
@@ -217,8 +238,8 @@ class App(ctk.CTk):
         self.geometry("1280x720")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        back.create_table()
-        
+        self.radio_var = ctk.StringVar(value="")
+
         self.table_screen = TableScreen(self)
         self.table_screen.grid(row=0, column=0, sticky="nsew")
 
@@ -234,5 +255,6 @@ class App(ctk.CTk):
         self.destroy()
 
 if __name__ == "__main__":
+    back.create_table()
     app = App()
     app.mainloop()
