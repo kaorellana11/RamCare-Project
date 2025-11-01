@@ -54,26 +54,18 @@ connection_obj = sqlite3.connect(db_path)
 cursor = connection_obj.cursor() 
 
 def create_table():
-
-    #if os.path.exists(db_path):
-    #    print("Database already exists.")
-    #else:
-        #Clear the table if it already exists
-        cursor.execute("DROP TABLE IF EXISTS RAMCARE")
-
-        #SQL works weird. You must make a query as a variable and then execute that query.
-        #You don't necessarily have to make it a variable, but I'll be doing so for now.
-        cursor.execute('''
-            CREATE TABLE RAMCARE (
-                Name VARCHAR(30) NOT NULL,
-                Blood_Type CHAR(5) NOT NULL,
-                Medicines VARCHAR(50) NOT NULL,
-                Date_of_birth CHAR(10) NOT NULL,
-                Email VARCHAR(30) NOT NULL,
-                Phone_Number CHAR(14) NOT NULL
-            );
-        ''')
-        insert_data("Kay Orellana", "O-", "Ibuprofen", "10/04/2004", "kaorellana52@gmail.com", "(123)-456-7890")
+    #SQL works weird. You must make a query as a variable and then execute that query.
+    #You don't necessarily have to make it a variable, but I'll be doing so for now.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS RAMCARE (
+            Name VARCHAR(30) NOT NULL,
+            Blood_Type CHAR(5) NOT NULL,
+            Medicines VARCHAR(50) NOT NULL,
+            Date_of_birth CHAR(10) NOT NULL,
+            Email VARCHAR(30) NOT NULL,
+            Phone_Number CHAR(14) NOT NULL
+        );
+    ''')
         
 
 def insert_data(name, blood_type, medicines, dob, email, number):
