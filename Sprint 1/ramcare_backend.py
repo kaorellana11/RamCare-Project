@@ -120,10 +120,10 @@ def delete_patient(name):
     sort_data()
 
 def search_by_name(name):
-    cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
-    print(cursor.fetchall())
-    connection_obj.commit()
-    print("Data successfully retrieved")
+    patient_info = cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
+    found_patient = Patient(*patient_info)
+    return found_patient
+    
 
 def main():
     create_table()
