@@ -120,9 +120,8 @@ def delete_patient(name):
     sort_data()
 
 def search_by_name(name):
-    patient_info = cursor.execute("SELECT * from RAMCARE WHERE Name = ?", (name,))
-    found_patient = Patient(*patient_info)
-    return found_patient
+    patient_info = cursor.execute("SELECT * from RAMCARE WHERE Name = ? LIMIT 1", (name,))
+    return tuple(patient_info)
     
 
 def main():
@@ -143,6 +142,8 @@ def main():
     #edit_patient("Tahj Williams", "AB-", "Tylenol", "12/05/1998", "tahj@coolguy.com", "(123)-456-7890", "Robert Smith")
     #delete_patient("Tahj Williams")
     #search_by_name("Kay")
+    
+    connection_obj.close()
 
 
 if __name__ == '__main__':
