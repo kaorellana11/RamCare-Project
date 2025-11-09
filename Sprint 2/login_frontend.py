@@ -11,6 +11,7 @@ class LogInScreen(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
         self.grid_columnconfigure(0, weight=1)
+        self.master = master
 
         top_label = ctk.CTkLabel(self, text= "Log In", fg_color="transparent", bg_color="#3b8ed0")
         top_label.grid(row = 0, column = 0, sticky="ew")
@@ -41,12 +42,43 @@ class LogInScreen(ctk.CTkFrame):
         self.remember_check.grid(row=7, column=0, pady=(10, 0))
         setFont(self.remember_check, size=14)
 
-        self.log_in_button = ctk.CTkButton(self, text="Log In", border_width=2, border_color="black", corner_radius=10)
+        self.log_in_button = ctk.CTkButton(self, text="Log In", border_width=2, border_color="black", corner_radius=10, command=self.log_in)
         self.log_in_button.grid(row=8, column=0, pady=(10, 0))
         setFont(self.log_in_button, size=14)
 
     def forgot_password(self):
         pass
+
+    def log_in(self):
+        self.master.security_screen.tkraise()
+
+class SecurityQuestionScreen(ctk.CTkFrame):
+    def __init__(self, master, questions):
+        super().__init__(master)
+        self.master = master
+        self.grid_columnconfigure(0, weight=1)
+        top_label = ctk.CTkLabel(self, text= "Log In", fg_color="transparent", bg_color="#3b8ed0")
+        top_label.grid(row = 0, column = 0, sticky="ew")
+        setFont(top_label)
+
+        border = ctk.CTkFrame(self, height=2, fg_color="black")
+        border.grid(row=1, column=0, sticky="ew", pady=(0, 75))
+
+        cur_row = 2
+        self.input_boxes = []
+        for question in questions:
+            question_label = ctk.CTkLabel(self, text=question)
+            question_label.grid(row=cur_row, column=0)
+            setFont(question_label)
+            cur_row += 1
+            question_box = ctk.CTkTextbox(self, height=35, width=400, border_color="black", border_width=2)
+            question_box.grid(row=cur_row, column=0, pady=(0, 50))
+            self.input_boxes.append(question_box)
+            cur_row += 1
+        self.log_in_button = ctk.CTkButton(self, text="Log In", border_width=2, border_color="black", corner_radius=10)
+        self.log_in_button.grid(row=cur_row, column=0, pady=(10, 0))
+        setFont(self.log_in_button, size=14)
+    
 
 class App(ctk.CTk):
     def __init__(self):
@@ -58,6 +90,9 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        self.security_screen = SecurityQuestionScreen(self, ["What city were you born in?", "What is your aunt's middle name?", "Where did you first attend school?"])
+        self.security_screen.grid(row=0, column=0, sticky="nsew")
+    
         self.log_in_screen = LogInScreen(self)
         self.log_in_screen.grid(row=0, column=0, sticky="nsew")
 
