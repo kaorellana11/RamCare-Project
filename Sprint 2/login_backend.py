@@ -63,7 +63,7 @@ def sort_user():
 def search_pass(username):
     cursor.execute("SELECT Password FROM Login WHERE Username = ?", (username,))
     foundpass = cursor.fetchone()
-    if len(foundpass) == 0:
+    if foundpass is None:
         return False
     foundpass = foundpass[-1]
 
@@ -75,7 +75,7 @@ def is_password(username, password):
     encoded = password.encode('utf-8')
 
     packed_salt = cursor.fetchone()
-    if len(packed_salt) == 0:
+    if packed_salt is None or len(packed_salt) == 0:
         return False
     
     salt = packed_salt[-1]
@@ -91,7 +91,7 @@ def search_question(username, questionNum):
     if questionNum == 1:
         cursor.execute("SELECT SecQ1 FROM Login WHERE Username = ?", (username,))
         foundquestion = cursor.fetchone()
-        if len(foundquestion) == 0:
+        if foundquestion is None or len(foundquestion) == 0:
             return False
         foundquestion = foundquestion[-1]
 
@@ -120,7 +120,7 @@ def is_security(username, secq1, secq2, secq3):
     encodedQ1 = secq1.encode('utf-8')
     cursor.execute("SELECT SaltQ1 FROM Login WHERE Username = ?", (username,))
     foundSaltQ1 = cursor.fetchone()
-    if len(foundSaltQ1) == 0:
+    if foundSaltQ1 is None or len(foundSaltQ1) == 0:
         return False
     SaltQ1 = foundSaltQ1[-1]
     hashedQ1 = bcrypt.hashpw(encodedQ1, SaltQ1)
@@ -129,7 +129,7 @@ def is_security(username, secq1, secq2, secq3):
     encodedQ2 = secq2.encode('utf-8')
     cursor.execute("SELECT SaltQ2 FROM Login WHERE Username = ?", (username,))
     foundSaltQ2 = cursor.fetchone()
-    if len(foundSaltQ2) == 0:
+    if foundSaltQ1 is None or len(foundSaltQ2) == 0:
         return False
     SaltQ2 = foundSaltQ2[-1]
     hashedQ2 = bcrypt.hashpw(encodedQ2, SaltQ2)
@@ -138,7 +138,7 @@ def is_security(username, secq1, secq2, secq3):
     encodedQ3 = secq3.encode('utf-8')
     cursor.execute("SELECT SaltQ3 FROM Login WHERE Username = ?", (username,))
     foundSaltQ3 = cursor.fetchone()
-    if len(foundSaltQ3) == 0:
+    if foundSaltQ3 is None or len(foundSaltQ3) == 0:
         return False
     SaltQ3 = foundSaltQ3[-1]
     hashedQ3 = bcrypt.hashpw(encodedQ3, SaltQ3)
@@ -161,7 +161,8 @@ def main():
     q3 = "sample3"
 
     store_login(username, password, q1, q2, q3)
-    print(is_security(username, "counter1", "counter2", "counter3"))
+    print(is_password("no one", password))
+    print(is_security("no one", "counter1", "counter2", "counter3"))
 
 if __name__ == "__main__":
     main()
