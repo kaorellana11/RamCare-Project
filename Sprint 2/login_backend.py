@@ -17,11 +17,12 @@ def create_table():
             SecQ2 VARCHAR(100) NOT NULL,
             SaltQ2 VARCHAR(50) NOT NULL,
             SecQ3 VARCHAR(100) NOT NULL,
-            SaltQ3 VARCHAR(50) NOT NULL
+            SaltQ3 VARCHAR(50) NOT NULL,
+            Remember INTEGER NOT NULL
         );
     ''')
 
-def store_login(username, password, secq1, secq2, secq3):
+def store_login(username, password, secq1, secq2, secq3, remember):
     encodedPass = password.encode('utf-8')
     passSalt = bcrypt.gensalt()
     hashedPass = bcrypt.hashpw(encodedPass, passSalt)
@@ -38,7 +39,7 @@ def store_login(username, password, secq1, secq2, secq3):
     saltQ3 = bcrypt.gensalt()
     hashedQ3 = bcrypt.hashpw(encodedSecQ3, saltQ3)
 
-    cursor.execute("INSERT INTO Login (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3))
+    cursor.execute("INSERT INTO Login (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Remember) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3, remember))
     #sort_user() // Don't know if needed yet
 
     connection_obj.commit()
@@ -54,10 +55,11 @@ def sort_user():
             SecQ2 VARCHAR(100) NOT NULL,
             SaltQ2 VARCHAR(50) NOT NULL,
             SecQ3 VARCHAR(100) NOT NULL,
-            SaltQ3 VARCHAR(50) NOT NULL
+            SaltQ3 VARCHAR(50) NOT NULL,
+            Remember INTEGER NOT NULL
         );
     ''')
-    cursor.execute("INSERT INTO Login_ordered (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3) SELECT Username, Password, PassSalt, SecQ1, SecQ2, SecQ3 FROM Login ORDER BY Username;")
+    cursor.execute("INSERT INTO Login_ordered (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Remember) SELECT Username, Password, PassSalt, SecQ1, SecQ2, SecQ3, Remember FROM Login ORDER BY Username;")
     connection_obj.commit()
 
 def search_pass(username):
@@ -151,6 +153,15 @@ def is_security(username, secq1, secq2, secq3):
     else:
         return False
 
+def remember_me():
+    cursor.execute("SELECT Username FROM Login WHERE Remember = 1")
+    foundUser = cursor.fetchone()
+    if foundUser is None or len(foundUser) == 0:
+        return False
+    else:
+        user = foundUser[-1]
+        return user
+
 def main():
     create_table()
 
@@ -160,9 +171,11 @@ def main():
     q2 = "sample2"
     q3 = "sample3"
 
-    store_login(username, password, q1, q2, q3)
-    print(is_password("no one", password))
-    print(is_security("no one", "counter1", "counter2", "counter3"))
+    store_login(username, password, q1, q2, q3, True)
+    user = remember_me()
+    print(user)
+    #print(is_password("no one", password))
+    #print(is_security("no one", "counter1", "counter2", "counter3"))
 
 if __name__ == "__main__":
     main()
