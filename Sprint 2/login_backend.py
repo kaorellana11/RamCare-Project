@@ -160,17 +160,18 @@ def remember_me():
         return False
     else:
         user = foundUser[-1]
+        print(user)
         return user
 
 def set_remember_false():
     if remember_me() != False:
         pastUser = remember_me()
-        cursor.execute("UPDATE Login SET Remember = 0 WHERE Username = ?", (pastUser))
+        cursor.execute("UPDATE Login SET Remember = 0 WHERE Username = ?", (pastUser,))
         connection_obj.commit()
 
 def set_remember_true(username):
     set_remember_false()
-    cursor.execute("UPDATE Login SET Remember = 1 WHERE Username = ?", (username))
+    cursor.execute("UPDATE Login SET Remember = 1 WHERE Username = ?", (username,))
     connection_obj.commit()
 
 def main():
@@ -182,8 +183,9 @@ def main():
     q2 = "sample2"
     q3 = "sample3"
 
-    #store_login(username, password, q1, q2, q3, True)
+    store_login(username, password, q1, q2, q3, True)
     user = remember_me()
+    set_remember_true(user)
     #print(is_password("no one", password))
     #print(is_security("no one", "counter1", "counter2", "counter3"))
 
