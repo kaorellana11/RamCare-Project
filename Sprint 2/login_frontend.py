@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import login_backend as back
 
 FONT_SIZE = 20
 FONT_FAMILY = "Lucida Console"
@@ -12,6 +13,7 @@ class LogInScreen(ctk.CTkFrame):
         super().__init__(master)
         self.grid_columnconfigure(0, weight=1)
         self.master = master
+        self.input_boxes = []
 
         top_label = ctk.CTkLabel(self, text= "Log In", fg_color="transparent", bg_color="#3b8ed0")
         top_label.grid(row = 0, column = 0, sticky="ew")
@@ -24,15 +26,17 @@ class LogInScreen(ctk.CTkFrame):
         username_label.grid(row=2, column=0, pady=(75, 0))
         setFont(username_label)
 
-        self.username_input = ctk.CTkTextbox(self, height=35, border_color="black", border_width=2)
-        self.username_input.grid(row=3, column=0)
+        username_input = ctk.CTkTextbox(self, height=35, border_color="black", border_width=2)
+        username_input.grid(row=3, column=0)
+        self.input_boxes.append(username_input)
 
         password_label = ctk.CTkLabel(self, text="Password")
         password_label.grid(row=4, column=0, pady=(100, 0))
         setFont(password_label)
 
-        self.password_input = ctk.CTkTextbox(self, height=35, border_color="black", border_width=2)
-        self.password_input.grid(row=5, column=0)
+        password_input = ctk.CTkTextbox(self, height=35, border_color="black", border_width=2)
+        password_input.grid(row=5, column=0)
+        self.input_boxes.append(password_input)
 
         forgot_password_button = ctk.CTkButton(self, text="Forgot Password?", text_color="blue", fg_color="transparent",hover=False, command=self.forgot_password)
         forgot_password_button.grid(row=6, column=0, pady=(10, 0))
@@ -46,11 +50,25 @@ class LogInScreen(ctk.CTkFrame):
         self.log_in_button.grid(row=8, column=0, pady=(10, 0))
         setFont(self.log_in_button, size=14)
 
+        self.wrong_password_label = ctk.CTkLabel(self, text="Incorrect Username or Password!", text_color="red")
+        self.wrong_password_label.grid(row=9, column=0, pady=(10, 0))
+        setFont(self.wrong_password_label)
+        self.wrong_password_label.grid_remove()
+
     def forgot_password(self):
         pass
 
     def log_in(self):
-        self.master.security_screen.tkraise()
+        credentials = []
+        for box in self.input_boxes:
+            credentials.append(box.get("0.0", "end-1c"))
+            
+        if back.is_password(*credentials):
+            self.wrong_password_label.grid_remove()
+            self.master.security_screen.tkraise()
+        else:
+            self.wrong_password_label.grid()
+
 
 class SecurityQuestionScreen(ctk.CTkFrame):
     def __init__(self, master, questions):
@@ -99,7 +117,7 @@ class App(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.closed)
         
     def closed(self):
-        #back.connection_obj.close()
+        back.connection_obj.close()
         self.destroy()
 
 if __name__ == "__main__":
