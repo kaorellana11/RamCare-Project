@@ -117,7 +117,7 @@ def search_question(username, questionNum):
 
         return foundquestion
 
-def is_security(username, secq1, secq2, secq3, remember):
+def is_security(username, secq1, secq2, secq3):
     foundQ1 = search_question(username, 1)
     encodedQ1 = secq1.encode('utf-8')
     cursor.execute("SELECT SaltQ1 FROM Login WHERE Username = ?", (username,))
