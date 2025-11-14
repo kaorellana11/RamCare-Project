@@ -117,7 +117,7 @@ def search_question(username, questionNum):
 
         return foundquestion
 
-def is_security(username, secq1, secq2, secq3):
+def is_security(username, secq1, secq2, secq3, remember):
     foundQ1 = search_question(username, 1)
     encodedQ1 = secq1.encode('utf-8')
     cursor.execute("SELECT SaltQ1 FROM Login WHERE Username = ?", (username,))
@@ -162,6 +162,17 @@ def remember_me():
         user = foundUser[-1]
         return user
 
+def set_remember_false():
+    if remember_me() != False:
+        pastUser = remember_me()
+        cursor.execute("UPDATE Login SET Remember = 0 WHERE Username = ?", (pastUser))
+        connection_obj.commit()
+
+def set_remember_true(username):
+    set_remember_false()
+    cursor.execute("UPDATE Login SET Remember = 1 WHERE Username = ?", (username))
+    connection_obj.commit()
+
 def main():
     create_table()
 
@@ -171,9 +182,8 @@ def main():
     q2 = "sample2"
     q3 = "sample3"
 
-    store_login(username, password, q1, q2, q3, True)
+    #store_login(username, password, q1, q2, q3, True)
     user = remember_me()
-    print(user)
     #print(is_password("no one", password))
     #print(is_security("no one", "counter1", "counter2", "counter3"))
 
