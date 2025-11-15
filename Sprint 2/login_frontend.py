@@ -164,7 +164,7 @@ class App(ctk.CTk):
         self.logged_in_screen = LoggedInScreen(self)
         self.logged_in_screen.grid(row=0, column=0, sticky="nsew")
 
-        self.security_screen = SecurityQuestionScreen(self, ["What city were you born in?", "What is your aunt's middle name?", "Where did you first attend school?"])
+        self.security_screen = SecurityQuestionScreen(self, ["Test Question 1", "Test Question 2", "Test Question 3"])
         self.security_screen.grid(row=0, column=0, sticky="nsew")
     
         self.log_in_screen = LogInScreen(self)

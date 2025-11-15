@@ -177,13 +177,13 @@ def set_remember_true(username):
 def main():
     create_table()
 
-    username = "smithre9"
-    password = "burgerman"
+    username = "testuser"
+    password = "testpswrd"
     q1 = "sample1"
     q2 = "sample2"
     q3 = "sample3"
 
-    store_login(username, password, q1, q2, q3, True)
+    store_login(username, password, q1, q2, q3, False)
     user = remember_me()
     set_remember_true(user)
     #print(is_password("no one", password))
