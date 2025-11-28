@@ -29,6 +29,9 @@ class LoggedInScreen(ctk.CTkFrame):
         setFont(self.log_out_button)
     
     def log_out(self):
+        if self.master.log_in_screen.remember_check.get() == 1:
+            self.master.log_in_screen.remember_check.deselect()
+            back.set_remember_false()
         self.master.log_in_screen.tkraise()
 
 class LogInScreen(ctk.CTkFrame):
@@ -137,8 +140,13 @@ class SecurityQuestionScreen(ctk.CTkFrame):
         if back.is_security(*sec_params):
             self.wrong_password_label.grid_remove()
             self.master.logged_in_screen.info_label.configure(text="Logged in as " + str(self.user_name) + ".")
+
+            if self.master.log_in_screen.remember_check.get() == 1:
+                back.set_remember_true(self.user_name)
+            
             for box in self.input_boxes:
                 box.delete("0.0", "end-1c")
+                
             self.master.logged_in_screen.tkraise()
         else:
             self.wrong_password_label.grid()
@@ -156,7 +164,7 @@ class App(ctk.CTk):
         self.logged_in_screen = LoggedInScreen(self)
         self.logged_in_screen.grid(row=0, column=0, sticky="nsew")
 
-        self.security_screen = SecurityQuestionScreen(self, ["What city were you born in?", "What is your aunt's middle name?", "Where did you first attend school?"])
+        self.security_screen = SecurityQuestionScreen(self, ["Test Question 1", "Test Question 2", "Test Question 3"])
         self.security_screen.grid(row=0, column=0, sticky="nsew")
     
         self.log_in_screen = LogInScreen(self)
@@ -164,6 +172,12 @@ class App(ctk.CTk):
 
         self.protocol("WM_DELETE_WINDOW", self.closed)
         
+        user_name = back.remember_me()
+        if (user_name != False): 
+            self.log_in_screen.remember_check.select()
+            self.logged_in_screen.info_label.configure(text="Logged in as " + str(user_name) + ".")
+            self.logged_in_screen.tkraise()
+
     def closed(self):
         back.connection_obj.close()
         self.destroy()
