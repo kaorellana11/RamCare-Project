@@ -20,7 +20,7 @@ def create_table():
             SaltQ3 VARCHAR(50) NOT NULL,
             Dob CHAR(10) NOT NULL,
             Provider VARCHAR(100) NOT NULL,
-            Medication VARCHAR(150) NOT NULL
+            Medication VARCHAR(100) NOT NULL
         );
     ''')
 
@@ -45,9 +45,46 @@ def store_login(username, password, secq1, secq2, secq3, dob, provider, medicati
 
     connection_obj.commit()
 
-def get_medications():
-    pass
+def get_medications(username):
+    cursor.execute("SELECT Medication FROM Patients WHERE Username = ?", (username,))
+    foundMeds = cursor.fetchone()
+    if foundMeds is None:
+        return False
+    foundMeds = foundMeds[-1]
 
-def get_provider():
-    pass
+    return foundMeds
+
+def get_provider(username):
+    cursor.execute("SELECT Provider FROM Patients WHERE Username = ?", (username,))
+    foundProv = cursor.fetchone()
+    if foundProv is None:
+        return False
+    foundProv = foundProv[-1]
+
+    return foundProv
+
+def main():
+    create_table()
+
+    username = "testuser"
+    password = "testpswrd"
+    q1 = "sample1"
+    q2 = "sample2"
+    q3 = "sample3"
+    dob = "01/01/1999"
+    provider = "Dominion Medical Associates"
+    medications = "Tylenol"
+
+    store_login(username, password, q1, q2, q3, dob, provider, medications)
+
+    testProv = get_provider(username)
+    if (testProv == provider):
+        print("Get Provider works")
+    
+    testMeds = get_medications(username)
+    if (testMeds == medications):
+        print("Get Medications works")
+    
+if __name__ == "__main__":
+    main()
 
