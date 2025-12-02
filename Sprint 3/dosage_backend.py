@@ -1,5 +1,6 @@
 import sqlite3
 import bcrypt
+import login_backend
 
 connection_obj = sqlite3.connect('patients.db')
 cursor = connection_obj.cursor()
