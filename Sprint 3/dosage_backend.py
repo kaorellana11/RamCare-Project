@@ -19,6 +19,7 @@ def create_table():
             SaltQ2 VARCHAR(50) NOT NULL,
             SecQ3 VARCHAR(100) NOT NULL,
             SaltQ3 VARCHAR(50) NOT NULL,
+            Remember INTEGER NOT NULL,
             Dob CHAR(10) NOT NULL,
             Provider VARCHAR(100) NOT NULL,
             Medication VARCHAR(100) NOT NULL,
@@ -26,7 +27,7 @@ def create_table():
         );
     ''')
 
-def store_login(username, password, secq1, secq2, secq3, dob, provider, medications, dosage):
+def store_login(username, password, secq1, secq2, secq3, remember, dob, provider, medications, dosage):
     encodedPass = password.encode('utf-8')
     passSalt = bcrypt.gensalt()
     hashedPass = bcrypt.hashpw(encodedPass, passSalt)
@@ -43,7 +44,7 @@ def store_login(username, password, secq1, secq2, secq3, dob, provider, medicati
     saltQ3 = bcrypt.gensalt()
     hashedQ3 = bcrypt.hashpw(encodedSecQ3, saltQ3)
 
-    cursor.execute("INSERT INTO Patients (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Dob, Provider, Medication, Dosage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3, dob, provider, medications, dosage))
+    cursor.execute("INSERT INTO Patients (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Remember, Dob, Provider, Medication, Dosage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3, remember, dob, provider, medications, dosage))
 
     connection_obj.commit()
 
@@ -96,12 +97,13 @@ def main():
     q1 = "sample1"
     q2 = "sample2"
     q3 = "sample3"
+    remember = False
     dob = "01/01/1999"
     provider = "Dominion Medical Associates"
     medications = "Tylenol"
     dosage = False
 
-    store_login(username, password, q1, q2, q3, dob, provider, medications, dosage)
+    store_login(username, password, q1, q2, q3, remember, dob, provider, medications, dosage)
 
     testProv = get_provider(username)
     if (testProv == provider):
