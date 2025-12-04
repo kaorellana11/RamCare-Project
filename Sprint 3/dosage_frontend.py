@@ -68,7 +68,7 @@ class TestUserLogInScreen(ctk.CTkFrame):
             self.master.dashboard.confirm_dosage_button.configure(state="disabled")
             self.master.dashboard.missed_dosage_button.configure(state="disabled")
         else:
-            dose_str += back.get_medications(username).replace(',', '\n')
+            dose_str += '\n'.join(back.get_medications(username))
         self.master.dashboard.info_box.meds_label.configure(text=dose_str)
         self.master.dashboard.tkraise()
 
@@ -140,13 +140,14 @@ class MissedDoseScreen(ctk.CTkFrame):
         self.confirm_button = None
         
     def populate_checkboxes(self):
-        medication_list = back.get_medications(username).split(',')
+        medication_list = back.get_medications(username)
         cur_row = 0
 
         label = ctk.CTkLabel(self, text="Select which medications were missed.")
         label.grid(row=cur_row, column=0, columnspan=2, pady=(20, 100))
         setFont(label)
 
+        cur_row += 1
         for medication in medication_list:
             self.checkboxes.append(ctk.CTkCheckBox(self, text=medication))
             self.checkboxes[-1].grid(row=cur_row, column=0, columnspan=2, pady=(20, 0))
@@ -155,11 +156,11 @@ class MissedDoseScreen(ctk.CTkFrame):
 
         self.back_button = ctk.CTkButton(self, text="Back", border_width=2, command=self.back)
         setFont(self.back_button)
-        self.back_button.grid(row=cur_row, column=0, sticky="e", padx=(0, 10), pady=(20, 0))
+        self.back_button.grid(row=cur_row, column=0, sticky="e", padx=(0, 10), pady=(40, 0))
 
         self.confirm_button = ctk.CTkButton(self, text="Confirm", border_width=2, command=self.confirm)
         setFont(self.confirm_button)
-        self.confirm_button.grid(row=cur_row, column=1, sticky="w", padx=(10, 0), pady=(20, 0))
+        self.confirm_button.grid(row=cur_row, column=1, sticky="w", padx=(10, 0), pady=(40, 0))
 
         self.confirm_window = None
 
