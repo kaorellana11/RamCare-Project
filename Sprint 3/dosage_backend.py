@@ -111,7 +111,7 @@ def next_day():
 def main():
     create_table()
 
-    username = "testuser"
+    username = "testuser1"
     password = "testpswrd"
     q1 = "sample1"
     q2 = "sample2"
@@ -122,7 +122,8 @@ def main():
     medications = "Tylenol"
     dosage = False
 
-    store_login(username, password, q1, q2, q3, remember, dob, provider, medications, dosage)
+    store_login("John Doe", username, password, q1, q2, q3, remember, dob, provider, medications, dosage)
+    store_login("Jane Doe", "testuser2", password, q1, q2, q3, False, "01/01/2000", provider, medications, dosage)
 
     testProv = get_provider(username)
     if (testProv == provider):
