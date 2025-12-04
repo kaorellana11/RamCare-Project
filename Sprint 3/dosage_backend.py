@@ -10,6 +10,7 @@ def create_table():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Patients (
+            Name VARCHAR(30) NOT NULL
             Username VARCHAR(30) NOT NULL,
             Password VARCHAR(80) NOT NULL,
             PassSalt VARCHAR(50) NOT NULL,
@@ -27,7 +28,7 @@ def create_table():
         );
     ''')
 
-def store_login(username, password, secq1, secq2, secq3, remember, dob, provider, medications, dosage):
+def store_login(name, username, password, secq1, secq2, secq3, remember, dob, provider, medications, dosage):
     encodedPass = password.encode('utf-8')
     passSalt = bcrypt.gensalt()
     hashedPass = bcrypt.hashpw(encodedPass, passSalt)
@@ -44,9 +45,18 @@ def store_login(username, password, secq1, secq2, secq3, remember, dob, provider
     saltQ3 = bcrypt.gensalt()
     hashedQ3 = bcrypt.hashpw(encodedSecQ3, saltQ3)
 
-    cursor.execute("INSERT INTO Patients (Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Remember, Dob, Provider, Medication, Dosage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3, remember, dob, provider, medications, dosage))
+    cursor.execute("INSERT INTO Patients (Name, Username, Password, PassSalt, SecQ1, SaltQ1, SecQ2, SaltQ2, SecQ3, SaltQ3, Remember, Dob, Provider, Medication, Dosage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (name, username, hashedPass, passSalt, hashedQ1, saltQ1, hashedQ2, saltQ2, hashedQ3, saltQ3, remember, dob, provider, medications, dosage))
 
     connection_obj.commit()
+
+def get_name(username):
+    cursor.execute("SELECT Name FROM Patients WHERE Username = ?", (username,))
+    foundName = cursor.fetchone()
+    if foundName is None:
+        return False
+    foundName = foundName[-1]
+
+    return foundName
 
 def get_dob(username):
     cursor.execute("SELECT Dob FROM Patients WHERE Username = ?", (username,))
