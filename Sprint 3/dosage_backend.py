@@ -10,7 +10,7 @@ def create_table():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Patients (
-            Name VARCHAR(30) NOT NULL
+            Name VARCHAR(30) NOT NULL,
             Username VARCHAR(30) NOT NULL,
             Password VARCHAR(80) NOT NULL,
             PassSalt VARCHAR(50) NOT NULL,
@@ -88,6 +88,15 @@ def get_provider(username):
     foundProv = foundProv[-1]
 
     return foundProv
+
+def get_dosage(username):
+    cursor.execute("SELECT Dosage FROM Patients WHERE Username = ?", (username,))
+    foundDosage = cursor.fetchone()
+    if foundDosage is None:
+        return False
+    foundDosage = foundDosage[-1]
+    
+    return foundDosage
 
 def confirm_dosage(username):
     cursor.execute("UPDATE Patients SET Dosage = True WHERE Username = ?", (username,))
